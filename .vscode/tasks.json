@@ -7,7 +7,7 @@
         {
             "taskName": "build",
             "args": [
-                "${workspaceRoot}/ParallelProcessing.csproj"
+                "${workspaceRoot}/Prime Number Discovery.csproj"
             ],
             "isBuildCommand": true,
             "problemMatcher": "$msCompile"
