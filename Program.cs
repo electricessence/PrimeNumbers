@@ -13,7 +13,7 @@ namespace ParallelProcessing
 			var sw = Stopwatch.StartNew();
 
 			var canceller = new CancellationTokenSource();
-			var worker = Task.Run(() => DiscoverPrimePercent(canceller.Token, 1000000000))
+			var worker = Task.Run(() => DiscoverPrimeMaxDeltas(canceller.Token))
 				.ContinueWith(s => Console.WriteLine("Elapsed: {0}", sw.Elapsed));
 
 			Console.ReadLine();

@@ -20,11 +20,11 @@ public class PrimeNumbers
 			.Where(v => IsPrime(v));
 	}
 
-	public IEnumerable<KeyValuePair<ulong,ulong>> IndexedValues() // 1 is the starting index.
+	public IEnumerable<KeyValuePair<ulong, ulong>> IndexedValues() // 1 is the starting index.
 	{
 		ulong count = 0;
-		foreach(var v in Values())
-			yield return KeyValuePair.Create(++count,v);
+		foreach (var v in Values())
+			yield return KeyValuePair.Create(++count, v);
 	}
 
 	public bool IsPrime(ulong value)
@@ -52,6 +52,7 @@ public class PrimeNumbers
 	{
 		return IsPrime((ulong)Math.Abs(value));
 	}
+
 
 	protected virtual bool IsPrimeInternal(ulong value)
 	{
@@ -96,10 +97,10 @@ public class PrimeNumbers
 		public new IEnumerable<ulong> Values()
 		{
 			return LazyInitializer.EnsureInitialized(ref _values,
-				()=> ValidPrimeTests()
+				() => ValidPrimeTests()
 					.Where(n =>
 					{
-						switch(n)
+						switch (n)
 						{
 							case 2:
 							case 3:
@@ -113,20 +114,30 @@ public class PrimeNumbers
 								return true;
 						}
 
-						if(n<23) return false;
+						if (n < 23) return false;
 
-						ulong last = 1;
-						// Recursion can occur here but that's okay!!! Uses predecessors to acquire this value.
-						foreach(var v in Values()) 
-						{
-							ulong stop = n / last; // The list of possibilities shrinks for each test.
-							if (v > stop) break; // Exceeded possibilities? 
-							if((n % v) == 0) return false;
-							last = v;
-						}
+						return MultiplesOf(n).First() == n;
+					}).Memoize(true));
+		}
 
-						return true;
-					}).Memoize(true) );
+		public IEnumerable<ulong> MultiplesOf(ulong value)
+		{
+			ulong last = 1;
+
+			foreach (var p in Values())
+			{
+				ulong stop = value / last; // The list of possibilities shrinks for each test.
+				if (p > stop) break; // Exceeded possibilities? 
+				while ((value % p) == 0)
+				{
+					value /= p;
+					yield return p;
+					if (value == 1) yield break;
+				}
+				last = p;
+			}
+
+			yield return value;
 		}
 
 		protected override bool IsPrimeInternal(ulong value)
