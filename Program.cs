@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
+using Open.Numeric.Primes;
 
-namespace ParallelProcessing
-{
+
 	class Program
 	{
 		static void Main(string[] args)
@@ -13,24 +14,33 @@ namespace ParallelProcessing
 			var sw = Stopwatch.StartNew();
 
 			var canceller = new CancellationTokenSource();
-			var worker = Task.Run(() => DiscoverPrimeMaxDeltas(canceller.Token))
+			var worker = Task.Run(() => SpeedTest(/*int.Parse(args[0])*/1000))
 				.ContinueWith(s => Console.WriteLine("Elapsed: {0}", sw.Elapsed));
 
-			Console.ReadLine();
+			//Console.ReadLine();
 			canceller.Cancel();
 
 			worker.Wait();
 		}
 
+		static void SpeedTest(int count)
+		{
+			BigInteger result = 1;
+			foreach (var p in Prime.NumbersBig().Take(count))
+			{
+				result *= p;
+				//Console.WriteLine(p);
+			}
+			//Console.WriteLine(result);
+			Console.WriteLine(7919*7919);
+		}
+
 		static void DiscoverPrimeMaxDeltas(CancellationToken token)
 		{
 
-			var optimized = PrimeNumbers.Default;
-			var bruteforce = PrimeNumbers.BruteForce.Instance;
-
 			ulong maxDelta = 0;
 			ulong last = 0;
-			foreach (var p in optimized.Values())//.TakeWhile(v=>v<100000))
+			foreach (var p in Prime.NumbersInParallel().Take(10000))
 			{
 				if (token.IsCancellationRequested)
 					break;
@@ -47,7 +57,7 @@ namespace ParallelProcessing
 						p, last, delta);
 					Console.Write(
 						", {0} / 2 = {1}",
-						delta / 2, maxDelta / 2);
+						delta, delta / 2);
 					Console.Write(
 						", {0} - {1} = {2}",
 						delta / 2, maxDelta / 2, delta / 2 - maxDelta / 2);
@@ -61,9 +71,7 @@ namespace ParallelProcessing
 		static void DiscoverPrimePercent(CancellationToken token, ulong maxCount = ulong.MaxValue)
 		{
 
-			var optimized = PrimeNumbers.Default;
-
-			foreach (var p in optimized.IndexedValues())
+			foreach (var p in Prime.NumbersIndexed())
 			{
 				if (p.Key >= maxCount || token.IsCancellationRequested)
 				{
@@ -74,4 +82,4 @@ namespace ParallelProcessing
 
 		}
 	}
-}
+

@@ -5,5 +5,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Open.Collections" Version="1.1.0" />
+    <PackageReference Include="Open.Numeric.Primes" Version="1.1.1" />
   </ItemGroup>
 </Project>
